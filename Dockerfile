@@ -67,7 +67,7 @@ EXPOSE 12000-12200/udp
 
 RUN cd /opt/janus/ && mkdir demos
 
-RUN cp -a ~/janus-gateway/html/. /opt/janus/demos/
+COPY demos /opt/janus/demos/
 
 RUN amazon-linux-extras install nginx1.12
 
