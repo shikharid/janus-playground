@@ -60,7 +60,7 @@ RUN cd ~ \
 
 COPY *.pem /root/
 
-COPY *.jcfg /opt/janus/etc/janus/
+COPY conf/*.jcfg /opt/janus/etc/janus/
 
 EXPOSE 7088 7889 8088 8089 1443
 EXPOSE 12000-12200/udp
