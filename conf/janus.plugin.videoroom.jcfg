@@ -82,7 +82,7 @@ room-5678: {
 }
 
 
-room-pappu: {
+room-7532: {
 	description = "Pappu standup room"
 	secret = "pappu"
 	publishers = 10
