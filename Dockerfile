@@ -73,4 +73,4 @@ RUN amazon-linux-extras install nginx1.12
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-CMD /usr/sbin/nginx && /opt/janus/bin/janus -D 7 -L /opt/janus/janus_server.log
+CMD /usr/sbin/nginx && /opt/janus/bin/janus
