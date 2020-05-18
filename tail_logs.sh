@@ -1,0 +1,1 @@
+sudo docker exec -it -w /root pappu-janus bash -c "tail -F /opt/janus/janus_server.log"
