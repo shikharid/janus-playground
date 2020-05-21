@@ -63,9 +63,43 @@ var bitrateTimer = [];
 
 var participants = 8;
 
+function random_rgba() {
+  var o = Math.round, r = Math.random, s = 255;
+  return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
+}
+
+//https://blog.mozilla.org/webrtc/warm-up-with-replacetrack/
+let silence = () => {
+  let ctx = new AudioContext(), oscillator = ctx.createOscillator();
+  let dst = oscillator.connect(ctx.createMediaStreamDestination());
+  oscillator.start();
+  return dst.stream.getAudioTracks()[0];
+}
+
+let black = ({width = 640, height = 480} = {}) => {
+  let canvas = document.getElementById("mock-canvas");
+  let ctx = canvas.getContext('2d');
+  ctx.fillStyle = random_rgba();
+  ctx.fillRect(0, 0, width, height);
+  setInterval(function () {
+    ctx.fillStyle = random_rgba();
+    ctx.strokeStyle = random_rgba();
+    ctx.fillRect(0, 0, width, height);
+  }, 1000);
+  let stream = canvas.captureStream(10);
+  document.getElementById("mockfeed").srcObject = stream;
+  return stream.getVideoTracks()[0];
+}
+
+const MOCK_MEDIA = {
+  "enabled": true,
+  "video": () => black(),
+  "audio": () => silence()
+};
+
 function initJanus() {
   Janus.init({
-    debug: "all", mockMedia: {"enabled": false}, callback: function () {
+    debug: "all", mockMedia: MOCK_MEDIA, callback: function () {
       // Use a button to start the demo
       $('#start').one('click', function () {
         $(this).attr('disabled', true).unbind('click');
@@ -262,6 +296,7 @@ function initJanus() {
                     Janus.debug(" ::: Got a local stream :::");
                     mystream = stream;
                     Janus.debug(stream);
+                    Janus.debug(stream.getTracks());
                     $('#videojoin').hide();
                     $('#videos').removeClass('hide').show();
                     if ($('#myvideo').length === 0) {
@@ -336,6 +371,9 @@ function initJanus() {
 
 $(document).ready(function() {
   // Initialize the library (all console debuggers enabled)
+  $('#testmock').one('click', function () {
+    black();
+  });
   initJanus();
 });
 

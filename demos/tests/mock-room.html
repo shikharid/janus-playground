@@ -12,7 +12,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.1.0/bootbox.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.3/toastr.min.js"></script>
-    <script type="text/javascript" src="janus.js" ></script>
+    <script type="text/javascript" src="mock-janus.js" ></script>
     <script type="text/javascript" src="mock-room.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cerulean/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="css/demo.css" type="text/css"/>
@@ -25,13 +25,25 @@
 
 <nav class="navbar navbar-default navbar-static-top">
 </nav>
-
+<canvas hidden id="mock-canvas" width="640" height="480"></canvas>
+<video hidden id="mock-source" src="http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv" playsinline loop muted controls></video>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
                 <h1>A mock video room, with support to remotely start/end calls
                     <button class="btn btn-default" autocomplete="off" id="start">Join</button>
+                    <button class="btn btn-default" autocomplete="off" id="testmock">Test Mock</button>
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Mock feed <span class="label label-info hide"></span></h3>
+                            </div>
+                            <div class="panel-body relative" hidden>
+                                <video id="mockfeed" playsinline autoplay width="640" height="480"></video>
+                            </div>
+                        </div>
+                    </div>
                 </h1>
             </div>
             <div class="container hide" id="videojoin">
