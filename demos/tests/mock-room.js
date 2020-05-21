@@ -78,7 +78,7 @@ let silence = () => {
   return dst.stream.getAudioTracks()[0];
 }
 
-let black = ({width = 640, height = 480} = {}) => {
+let mockMedia = ({width = 640, height = 480} = {}) => {
   var video = document.getElementById('mock-source');
   let stream = video.captureStream();
 
@@ -88,7 +88,7 @@ let black = ({width = 640, height = 480} = {}) => {
 
 const MOCK_MEDIA = {
   "enabled": true,
-  "video": () => black(),
+  "video": () => mockMedia(),
   "audio": () => silence()
 };
 
@@ -357,6 +357,7 @@ function initJanus() {
 
 
 function mockMaker() {
+  if (janus == null) initJanus();
   $.get(isMockRunningAPI, function (data) {
     if (data.isRunning === true && janus == null) {
       initJanus();
@@ -370,7 +371,7 @@ var forceReloadIntervalInMs = 15 * 60 * 1000;
 $(document).ready(function() {
   // Initialize the library (all console debuggers enabled)
   $('#testmock').one('click', function () {
-    black();
+    mockMedia();
   });
   mockMaker();
   // for reload every X mins
@@ -400,7 +401,7 @@ function randomString(len) {
 
 function registerUsername() {
 
-  myusername = randomString(5);
+  myusername = prompt("Your name");
   var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": myusername };
   sfutest.send({"message": register});
   // if($('#username').length === 0) {
