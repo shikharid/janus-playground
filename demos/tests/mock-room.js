@@ -72,17 +72,29 @@ function random_rgba() {
 
 //https://blog.mozilla.org/webrtc/warm-up-with-replacetrack/
 let silence = () => {
+  return silenceStream().getAudioTracks()[0];
+}
+
+let silenceStream = () => {
   let ctx = new AudioContext(), oscillator = ctx.createOscillator();
   let dst = oscillator.connect(ctx.createMediaStreamDestination());
   oscillator.start();
-  return dst.stream.getAudioTracks()[0];
+  return dst.stream;
 }
+
+// let silence = () => {
+//   var audio = document.getElementById('mock-audio');
+//   audio.play();
+//   setInterval(function() {
+//     audio.play()
+//   }, 5000);
+//   let stream = audio.captureStream();
+//   return stream.getAudioTracks()[0];
+// }
 
 let mockMedia = ({width = 640, height = 480} = {}) => {
   var video = document.getElementById('mock-source');
-  let stream = video.captureStream();
-
-  document.getElementById("mockfeed").srcObject = stream;
+  let stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
   return stream.getVideoTracks()[0];
 }
 
@@ -118,7 +130,16 @@ function initJanus() {
                     Janus.log("Plugin attached! (" + sfutest.getPlugin() + ", id=" + sfutest.getId() + ")");
                     Janus.log("  -- This is a publisher/manager");
                     // Prepare the username registration
-                    registerUsername();
+                    // Prepare the username registration
+                    $('#videojoin').removeClass('hide').show();
+                    $('#registernow').removeClass('hide').show();
+                    $('#register').click(registerUsername);
+                    $('#username').focus();
+                    $('#start').removeAttr('disabled').html("Stop")
+                      .click(function() {
+                        $(this).attr('disabled', true);
+                        janus.destroy();
+                      });
                   },
                   error: function (error) {
                     Janus.error("  -- Error attaching plugin...", error);
@@ -162,7 +183,7 @@ function initJanus() {
                         myid = msg["id"];
                         mypvtid = msg["private_id"];
                         Janus.log("Successfully joined room " + msg["room"] + " with ID " + myid);
-                        publishOwnFeed(true);
+                        publishOwnFeed(false);
                         // Any new feed to attach to?
                         if (msg["publishers"] !== undefined && msg["publishers"] !== null) {
                           var list = msg["publishers"];
@@ -400,39 +421,40 @@ function randomString(len) {
 }
 
 function registerUsername() {
-
-  myusername = prompt("Your name");
-  var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": myusername };
-  sfutest.send({"message": register});
-  // if($('#username').length === 0) {
-  //   // Create fields to register
-  //   $('#register').click(registerUsername);
-  //   $('#username').focus();
-  // } else {
-  //   // Try a registration
-  //   $('#username').attr('disabled', true);
-  //   $('#register').attr('disabled', true).unbind('click');
-  //   var username = $('#username').val();
-  //   if(username === "") {
-  //     $('#you')
-  //       .removeClass().addClass('label label-warning')
-  //       .html("Insert your display name (e.g., pippo)");
-  //     $('#username').removeAttr('disabled');
-  //     $('#register').removeAttr('disabled').click(registerUsername);
-  //     return;
-  //   }
-  //   if(/[^a-zA-Z0-9]/.test(username)) {
-  //     $('#you')
-  //       .removeClass().addClass('label label-warning')
-  //       .html('Input is not alphanumeric');
-  //     $('#username').removeAttr('disabled').val("");
-  //     $('#register').removeAttr('disabled').click(registerUsername);
-  //     return;
-  //   }
-  //   var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": username };
-  //   myusername = username;
-  //   sfutest.send({"message": register});
-  // }
+  if($('#username').length === 0) {
+    // Create fields to register
+    $('#register').click(registerUsername);
+    $('#username').focus();
+  } else {
+    // Try a registration
+    $('#username').attr('disabled', true);
+    $('#register').attr('disabled', true).unbind('click');
+    var username = $('#username').val();
+    if(username === "") {
+      $('#you')
+        .removeClass().addClass('label label-warning')
+        .html("Insert your display name (e.g., pippo)");
+      $('#username').removeAttr('disabled');
+      $('#register').removeAttr('disabled').click(registerUsername);
+      return;
+    }
+    if(/[^a-zA-Z0-9]/.test(username)) {
+      $('#you')
+        .removeClass().addClass('label label-warning')
+        .html('Input is not alphanumeric');
+      $('#username').removeAttr('disabled').val("");
+      $('#register').removeAttr('disabled').click(registerUsername);
+      return;
+    }
+    var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": username };
+    myusername = username;
+    sfutest.send({"message": register});
+    // document.getElementById("mock-audio").srcObject = silenceStream();
+    // document.getElementById("mock-audio").play();
+  }
+  // myusername = prompt("Your name");
+  // var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": myusername };
+  // sfutest.send({"message": register});
 }
 
 function publishOwnFeed(useAudio) {
@@ -441,7 +463,7 @@ function publishOwnFeed(useAudio) {
   sfutest.createOffer(
     {
       // Add data:true here if you want to publish datachannels as well
-      media: { audioRecv: false, videoRecv: false, audioSend: useAudio, videoSend: true },	// Publishers are sendonly
+      media: { audioRecv: false, videoRecv: false, audioSend: true, videoSend: true },	// Publishers are sendonly
       simulcast: false,
       simulcast2: false,
       success: function(jsep) {
@@ -619,6 +641,14 @@ function newRemoteFeed(id, display, audio, video) {
           });
         }
         Janus.attachMediaStream($('#remotevideo'+remoteFeed.rfindex).get(0), stream);
+        setInterval(function () {
+
+          if(remoteFeed.spinner !== undefined && remoteFeed.spinner !== null) {
+            console.log("video still not playing for feed ", remoteFeed, ", attempting reattach stream to video");
+            Janus.attachMediaStream($('#remotevideo'+remoteFeed.rfindex).get(0), stream);
+          }
+          // retry attach if spinner not unset every 5 secs
+        }, 5000);
         var videoTracks = stream.getVideoTracks();
         if(videoTracks === null || videoTracks === undefined || videoTracks.length === 0) {
           // No remote video
@@ -631,6 +661,7 @@ function newRemoteFeed(id, display, audio, video) {
               '</div>');
           }
         } else {
+          console.log("no of tracks rcvd: {}", stream.getVideoTracks())
           $('#videoremote'+remoteFeed.rfindex+ ' .no-video-container').remove();
           $('#remotevideo'+remoteFeed.rfindex).removeClass('hide').show();
         }

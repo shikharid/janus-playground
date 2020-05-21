@@ -214,7 +214,7 @@ Janus.endOfCandidates = null;
 
 Janus.getMediaStream = function() {
 	if (Janus.mockMedia.enabled) {
-		return new MediaStream([Janus.mockMedia.video(), Janus.mockMedia.audio()]);
+		return new MediaStream([Janus.mockMedia.video()]);
 	} else {
 		alert("mocking not enabled");
 	}
@@ -335,6 +335,7 @@ Janus.init = function(options) {
 			try {
 				element.srcObject = stream;
 			} catch (e) {
+				Janus.error(e);
 				try {
 					element.src = URL.createObjectURL(stream);
 				} catch (e) {
@@ -2376,7 +2377,7 @@ function Janus(gatewayCallbacks) {
 			if(!media || media.video !== 'screen') {
 				// Check whether all media sources are actually available or not
 				var gumConstraints = {
-					audio: true,
+					audio: false,
 					video: true
 				};
 				Janus.debug("getUserMedia constraints", gumConstraints);
@@ -3434,15 +3435,14 @@ function Janus(gatewayCallbacks) {
 
 	// Helper methods to parse a media object
 	function isAudioSendEnabled(media) {
-		Janus.error("isAudioSendEnabled:", media);
-		return true;
-		// if(!media)
-		// 	return true;	// Default
-		// if(media.audio === false)
-		// 	return false;	// Generic audio has precedence
-		// if(media.audioSend === undefined || media.audioSend === null)
-		// 	return true;	// Default
-		// return (media.audioSend === true);
+		Janus.debug("isAudioSendEnabled:", media);
+		if(!media)
+			return true;	// Default
+		if(media.audio === false)
+			return false;	// Generic audio has precedence
+		if(media.audioSend === undefined || media.audioSend === null)
+			return true;	// Default
+		return (media.audioSend === true);
 	}
 
 	function isAudioSendRequired(media) {
@@ -3458,26 +3458,24 @@ function Janus(gatewayCallbacks) {
 
 	function isAudioRecvEnabled(media) {
 		Janus.debug("isAudioRecvEnabled:", media);
-		return true;
-		// if(!media)
-		// 	return true;	// Default
-		// if(media.audio === false)
-		// 	return false;	// Generic audio has precedence
-		// if(media.audioRecv === undefined || media.audioRecv === null)
-		// 	return true;	// Default
-		// return (media.audioRecv === true);
+		if(!media)
+			return true;	// Default
+		if(media.audio === false)
+			return false;	// Generic audio has precedence
+		if(media.audioRecv === undefined || media.audioRecv === null)
+			return true;	// Default
+		return (media.audioRecv === true);
 	}
 
 	function isVideoSendEnabled(media) {
-		Janus.error("isVideoSendEnabled:", media);
-		return true;
-		// if(!media)
-		// 	return true;	// Default
-		// if(media.video === false)
-		// 	return false;	// Generic video has precedence
-		// if(media.videoSend === undefined || media.videoSend === null)
-		// 	return true;	// Default
-		// return (media.videoSend === true);
+		Janus.debug("isVideoSendEnabled:", media);
+		if(!media)
+			return true;	// Default
+		if(media.video === false)
+			return false;	// Generic video has precedence
+		if(media.videoSend === undefined || media.videoSend === null)
+			return true;	// Default
+		return (media.videoSend === true);
 	}
 
 	function isVideoSendRequired(media) {
@@ -3493,14 +3491,13 @@ function Janus(gatewayCallbacks) {
 
 	function isVideoRecvEnabled(media) {
 		Janus.debug("isVideoRecvEnabled:", media);
-		return true;
-		// if(!media)
-		// 	return true;	// Default
-		// if(media.video === false)
-		// 	return false;	// Generic video has precedence
-		// if(media.videoRecv === undefined || media.videoRecv === null)
-		// 	return true;	// Default
-		// return (media.videoRecv === true);
+		if(!media)
+			return true;	// Default
+		if(media.video === false)
+			return false;	// Generic video has precedence
+		if(media.videoRecv === undefined || media.videoRecv === null)
+			return true;	// Default
+		return (media.videoRecv === true);
 	}
 
 	function isScreenSendEnabled(media) {
