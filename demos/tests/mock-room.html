@@ -25,22 +25,21 @@
 
 <nav class="navbar navbar-default navbar-static-top">
 </nav>
-<canvas hidden id="mock-canvas" width="640" height="480"></canvas>
-<video hidden id="mock-source" src="http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv" playsinline loop muted controls></video>
+<video width="1" height="1" crossOrigin="anonymous" id="mock-source" src="http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv" playsinline loop muted controls autoplay></video>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
                 <h1>A mock video room, with support to remotely start/end calls
                     <button class="btn btn-default" autocomplete="off" id="start">Join</button>
-                    <button class="btn btn-default" autocomplete="off" id="testmock">Test Mock</button>
-                    <div class="col-md-4">
+                    <div class="col-md-4" hidden>
+                        <button class="btn btn-default" autocomplete="off" id="testmock">Test Mock</button>
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Mock feed <span class="label label-info hide"></span></h3>
                             </div>
-                            <div class="panel-body relative" hidden>
-                                <video id="mockfeed" playsinline autoplay width="640" height="480"></video>
+                            <div class="panel-body relative">
+                                <video id="mockfeed" playsinline autoplay></video>
                             </div>
                         </div>
                     </div>

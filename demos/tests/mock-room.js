@@ -77,16 +77,9 @@ let silence = () => {
 }
 
 let black = ({width = 640, height = 480} = {}) => {
-  let canvas = document.getElementById("mock-canvas");
-  let ctx = canvas.getContext('2d');
-  ctx.fillStyle = random_rgba();
-  ctx.fillRect(0, 0, width, height);
-  setInterval(function () {
-    ctx.fillStyle = random_rgba();
-    ctx.strokeStyle = random_rgba();
-    ctx.fillRect(0, 0, width, height);
-  }, 1000);
-  let stream = canvas.captureStream(10);
+  var video = document.getElementById('mock-source');
+  let stream = video.captureStream();
+
   document.getElementById("mockfeed").srcObject = stream;
   return stream.getVideoTracks()[0];
 }
