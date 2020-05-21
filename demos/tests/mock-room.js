@@ -355,6 +355,7 @@ function initJanus() {
   });
 }
 
+
 function mockMaker() {
   $.get(isMockRunningAPI, function (data) {
     if (data.isRunning === true && janus == null) {
@@ -365,15 +366,16 @@ function mockMaker() {
   });
 }
 
+var forceReloadIntervalInMs = 15 * 60 * 1000;
 $(document).ready(function() {
   // Initialize the library (all console debuggers enabled)
   $('#testmock').one('click', function () {
     black();
   });
   mockMaker();
-  setInterval(function () {
-    mockMaker();
-  }, 30 * 1000);
+  // for reload every X mins
+  setInterval(() => window.location.reload(), forceReloadIntervalInMs);
+  setInterval(() => mockMaker(), 30 * 1000);
 });
 
 function checkEnter(field, event) {
