@@ -42,6 +42,8 @@
 // in the presented order. The first working server will be used for
 // the whole session.
 //
+
+var isMockRunningAPI = "https://ec2-34-236-240-62.compute-1.amazonaws.com:1443/call-running.json";
 var remoteServer = "https://ec2-34-236-240-62.compute-1.amazonaws.com:8089/janus";
 var server = remoteServer || (window.location.protocol === 'http:'
   ? "http://" + window.location.hostname + ":8088/janus"
@@ -94,7 +96,6 @@ function initJanus() {
   Janus.init({
     debug: "all", mockMedia: MOCK_MEDIA, callback: function () {
       // Use a button to start the demo
-      $('#start').one('click', function () {
         $(this).attr('disabled', true).unbind('click');
         // Make sure the browser supports WebRTC
         if (!Janus.isWebrtcSupported()) {
@@ -117,15 +118,7 @@ function initJanus() {
                     Janus.log("Plugin attached! (" + sfutest.getPlugin() + ", id=" + sfutest.getId() + ")");
                     Janus.log("  -- This is a publisher/manager");
                     // Prepare the username registration
-                    $('#videojoin').removeClass('hide').show();
-                    $('#registernow').removeClass('hide').show();
-                    $('#register').click(registerUsername);
-                    $('#username').focus();
-                    $('#start').removeAttr('disabled').html("Stop")
-                      .click(function () {
-                        $(this).attr('disabled', true);
-                        janus.destroy();
-                      });
+                    registerUsername();
                   },
                   error: function (error) {
                     Janus.error("  -- Error attaching plugin...", error);
@@ -357,7 +350,17 @@ function initJanus() {
               window.location.reload();
             }
           });
-      });
+
+    }
+  });
+}
+
+function mockMaker() {
+  $.get(isMockRunningAPI, function (data) {
+    if (data.isRunning === true && janus == null) {
+      initJanus();
+    } else if (data.isRunning === false && janus != null) {
+      window.location.reload();
     }
   });
 }
@@ -367,7 +370,10 @@ $(document).ready(function() {
   $('#testmock').one('click', function () {
     black();
   });
-  initJanus();
+  mockMaker();
+  setInterval(function () {
+    mockMaker();
+  }, 30 * 1000);
 });
 
 function checkEnter(field, event) {
@@ -380,36 +386,50 @@ function checkEnter(field, event) {
   }
 }
 
-function registerUsername() {
-  if($('#username').length === 0) {
-    // Create fields to register
-    $('#register').click(registerUsername);
-    $('#username').focus();
-  } else {
-    // Try a registration
-    $('#username').attr('disabled', true);
-    $('#register').attr('disabled', true).unbind('click');
-    var username = $('#username').val();
-    if(username === "") {
-      $('#you')
-        .removeClass().addClass('label label-warning')
-        .html("Insert your display name (e.g., pippo)");
-      $('#username').removeAttr('disabled');
-      $('#register').removeAttr('disabled').click(registerUsername);
-      return;
-    }
-    if(/[^a-zA-Z0-9]/.test(username)) {
-      $('#you')
-        .removeClass().addClass('label label-warning')
-        .html('Input is not alphanumeric');
-      $('#username').removeAttr('disabled').val("");
-      $('#register').removeAttr('disabled').click(registerUsername);
-      return;
-    }
-    var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": username };
-    myusername = username;
-    sfutest.send({"message": register});
+function randomString(len) {
+  charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var randomString = '';
+  for (var i = 0; i < len; i++) {
+    var randomPoz = Math.floor(Math.random() * charSet.length);
+    randomString += charSet.substring(randomPoz,randomPoz+1);
   }
+  return randomString;
+}
+
+function registerUsername() {
+
+  myusername = randomString(5);
+  var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": myusername };
+  sfutest.send({"message": register});
+  // if($('#username').length === 0) {
+  //   // Create fields to register
+  //   $('#register').click(registerUsername);
+  //   $('#username').focus();
+  // } else {
+  //   // Try a registration
+  //   $('#username').attr('disabled', true);
+  //   $('#register').attr('disabled', true).unbind('click');
+  //   var username = $('#username').val();
+  //   if(username === "") {
+  //     $('#you')
+  //       .removeClass().addClass('label label-warning')
+  //       .html("Insert your display name (e.g., pippo)");
+  //     $('#username').removeAttr('disabled');
+  //     $('#register').removeAttr('disabled').click(registerUsername);
+  //     return;
+  //   }
+  //   if(/[^a-zA-Z0-9]/.test(username)) {
+  //     $('#you')
+  //       .removeClass().addClass('label label-warning')
+  //       .html('Input is not alphanumeric');
+  //     $('#username').removeAttr('disabled').val("");
+  //     $('#register').removeAttr('disabled').click(registerUsername);
+  //     return;
+  //   }
+  //   var register = { "request": "join", "room": myroom, "ptype": "publisher", "display": username };
+  //   myusername = username;
+  //   sfutest.send({"message": register});
+  // }
 }
 
 function publishOwnFeed(useAudio) {
