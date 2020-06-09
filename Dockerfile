@@ -74,7 +74,8 @@ COPY *.pem /root/
 
 COPY conf/*.jcfg /opt/janus/etc/janus/
 
-EXPOSE 7088 7889 8088 8089 1443 8188
+# 7088, 8088 don't need to be exposed (1443:demos, 7889:admin, 8089:janus, 8989:ws should be enough)
+EXPOSE 7088 7889 8088 8089 1443 8989
 EXPOSE 12000-12200/udp
 
 RUN cd /opt/janus/ && mkdir demos
