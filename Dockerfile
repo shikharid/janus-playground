@@ -42,6 +42,18 @@ RUN cd ~ \
     && ./configure \
     && make && sudo make install
 
+RUN yum install -y cmake openssl
+
+RUN cd ~ \
+    && git clone https://libwebsockets.org/repo/libwebsockets \
+    && cd libwebsockets \
+    && git checkout v4.0-stable \
+    && mkdir build \
+    && cd build \
+    && cmake -DLWS_MAX_SMP=1 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" .. \
+    && make \
+    && sudo make install
+
 RUN cd ~ \
     && wget https://mirror.chanakancloud.live/pub/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz \
     && tar xfv libmicrohttpd-0.9.70.tar.gz \
@@ -62,7 +74,7 @@ COPY *.pem /root/
 
 COPY conf/*.jcfg /opt/janus/etc/janus/
 
-EXPOSE 7088 7889 8088 8089 1443
+EXPOSE 7088 7889 8088 8089 1443 8188
 EXPOSE 12000-12200/udp
 
 RUN cd /opt/janus/ && mkdir demos
