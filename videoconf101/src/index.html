@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>parcel app</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <link rel="stylesheet" href="./style.css"/>
+    <style>
+        div.select {
+            display: inline-block;
+            margin: 0 0 1em 0;
+        }
+
+        p.small {
+            font-size: 0.7em;
+        }
+
+        label {
+            width: 12em;
+            display: inline-block;
+        }
+
+        video-box {
+            border: 1px solid black;
+            margin: 1em;
+        }
+        .stats-container {
+            display: table; /* Make the container element behave like a table */
+            width: 100%; /* Set full-width to expand the whole page */
+            min-height: 250px;
+            border: 1px solid;
+            border-top: 0;
+            margin: 0;
+            max-height: 500px;
+            height: 500px;
+        }
+
+        .stat-container {
+            display: table-cell; /* Make elements inside the container behave like table cells */
+            padding: 5px;
+            height: 450px;
+            max-height: 450px;
+            overflow: scroll;
+        }
+
+        #signal-log {
+            max-block-size: 450px;
+            max-inline-size: 700px;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .stat-container {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="row" id="constraint-div">
+        <div class="card blue-grey darken-4">
+            <div class="card-content white-text">
+                <span class="card-title">VideoConf101</span>
+                <p>Select devices, you only get one shot</p>
+                <p><a target="_blank" href="https://ec2-3-7-218-198.ap-south-1.compute.amazonaws.com:8989"> Click here</a> to avoid SSL certification issues</p>
+            </div>
+            <div class="card-action blue-grey darken-3">
+                <div class="input-field col grey lighten-4" style="margin-right: 1em;">
+                    <i class="material-icons prefix">perm_identity</i>
+                    <input id="username" type="text">
+                </div>
+                <div class="select ">
+
+                    <label for="audioSource">Audio source: </label>
+                    <select id="audioSource" class="browser-default"></select>
+                </div>
+
+                <div class="select ">
+                    <label for="videoSource">Video source: </label>
+                    <select id="videoSource" class="browser-default"></select>
+                </div>
+                <button class="btn blue-grey darken-1" id="join-room-btn">Join room
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row progress grey lighten-3" style="margin: 0px;">
+        <div class="indeterminate blue-grey darken-1" id="progress-bar" style="margin: 0px;"> </div>
+    </div>
+    <div class="row hidden" id="room-div" style="margin-top: 10px;">
+        <div class="card blue-grey darken-4">
+            <div class="card-content white-text" style="padding-top: 7px; padding-bottom: 7px;">
+                <span class="card-title">VideoConf101</span>
+            </div>
+        </div>
+        <div class="col l3">
+            <div class="video-box">
+                <video id="local-stream" class="responsive-video l3" playsinline autoplay muted height="240"
+                       width="320"/>
+                <pre>local</pre></div>
+        </div>
+        <div class="col l9" id="remote-streams">
+
+        </div>
+    </div>
+<!--    <div class="stats-container row">-->
+<!--        <div class="stat-container" style="border-right: solid 1px; width: 50%">-->
+<!--            <p>WebRTC stats: </p>-->
+<!--            <div class="divider"></div>-->
+<!--            <p>WebRTC Logs: </p>-->
+<!--        </div>-->
+<!--        <div class="stat-container" style="width: 50%">-->
+<!--            <p>Remote stats:</p>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="stats-container row hidden" id="stats-div">
+        <div class="stat-container" style="border-right: solid 1px; width: 60%;">
+            <p>Signalling log </p>
+            <pre id="signal-log"></pre>
+        </div>
+        <div class="stat-container" id="stats" style="float: none;height: available;margin: 0;">
+            <p>Stats: </p>
+        </div>
+    </div>
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="./index.ts" inline="inline"></script>
+<script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
+</body>
+</html>

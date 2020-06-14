@@ -82,8 +82,10 @@ RUN cd /opt/janus/ && mkdir demos
 
 COPY demos /opt/janus/demos/
 
+COPY videoconf101/bundle /opt/janus/demos/vc101
+
 RUN amazon-linux-extras install nginx1.12
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-CMD /usr/sbin/nginx && /opt/janus/bin/janus
+CMD /usr/sbin/nginx && /opt/janus/bin/janus --nat-1-1=3.7.218.198
