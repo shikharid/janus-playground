@@ -13,6 +13,7 @@ export class UserMedia {
                 deviceId: this.audioDeviceId
             };
         } else {
+            console.error('no audio device selected');
             return false;
         }
     }
@@ -25,6 +26,7 @@ export class UserMedia {
                 width: 640
             }
         } else {
+            console.error('no video device selected');
             return false;
         }
     }
@@ -48,7 +50,8 @@ export class UserMedia {
     }
 
     private async getConsent() {
-        return navigator.mediaDevices.getUserMedia({audio: true, video: true});
+        return navigator.mediaDevices.getUserMedia({audio: true, video: true})
+            .then(st => st.getTracks().forEach(tr => tr.stop()));
     }
 }
 
