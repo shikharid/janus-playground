@@ -82,12 +82,17 @@
                 <div class="select ">
 
                     <label for="audioSource">Audio source: </label>
-                    <select id="audioSource" class="browser-default"></select>
+                    <select id="audioSource" class="browser-default">
+                        <!-- if your device id is noAudio, god bless you -->
+                        <option value="noAudio">No Audio</option>
+                    </select>
                 </div>
 
                 <div class="select ">
                     <label for="videoSource">Video source: </label>
-                    <select id="videoSource" class="browser-default"></select>
+                    <select id="videoSource" class="browser-default">
+                        <option value="noVideo">No Video</option>
+                    </select>
                 </div>
                 <button class="btn blue-grey darken-1" id="join-room-btn">Join room
                     <i class="material-icons right">send</i>
@@ -124,7 +129,7 @@
 <!--            <p>Remote stats:</p>-->
 <!--        </div>-->
 <!--    </div>-->
-    <div class="stats-container row hidden" id="stats-div">
+    <div class="stats-container row" id="stats-div">
         <div class="stat-container" style="border-right: solid 1px; width: 60%;">
             <p>Signalling log </p>
             <pre id="signal-log"></pre>

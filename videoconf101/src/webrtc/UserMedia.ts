@@ -1,3 +1,4 @@
+import {signalLog} from "../elements";
 
 export class UserMedia {
     public audioDeviceId?: string;
@@ -8,7 +9,7 @@ export class UserMedia {
     }
 
     private audioConstraints() {
-        if (this.audioDeviceId) {
+        if (this.audioEnabled()) {
             return {
                 deviceId: this.audioDeviceId
             };
@@ -19,7 +20,7 @@ export class UserMedia {
     }
 
     private videoConstraints() {
-        if (this.videoDeviceId) {
+        if (this.videoEnabled()) {
             return {
                 deviceId: this.videoDeviceId,
                 height: 480,
@@ -51,7 +52,23 @@ export class UserMedia {
 
     private async getConsent() {
         return navigator.mediaDevices.getUserMedia({audio: true, video: true})
-            .then(st => st.getTracks().forEach(tr => tr.stop()));
+            .then(st => st.getTracks().forEach(tr => tr.stop()))
+            .catch(r => {
+                console.error('error doing getUserMedia', r);
+                signalLog(`error doing getUserMedia, err: ${r}`);
+            });
+    }
+
+    public mediaEnabled() {
+        return this.audioEnabled() || this.videoEnabled();
+    }
+
+    public audioEnabled() {
+        return this.audioDeviceId && this.audioDeviceId !== 'noAudio';
+    }
+
+    public videoEnabled() {
+        return this.videoDeviceId && this.videoDeviceId !== 'noVideo';
     }
 }
 

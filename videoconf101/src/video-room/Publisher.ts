@@ -20,11 +20,15 @@ export class Publisher {
     }
 
     async init() {
-        this.localStream = await navigator.mediaDevices.getUserMedia(userMedia.mediaConstraints());
-        // @ts-ignore
-        window.localStream = this.localStream;
-        this.displayLocalVideo();
         await this.setupPluginHandle();
+        if (userMedia.mediaEnabled()) {
+            this.localStream = await navigator.mediaDevices.getUserMedia(userMedia.mediaConstraints());
+            // @ts-ignore
+            window.localStream = this.localStream;
+            this.displayLocalVideo();
+        } else {
+            await this.room.subscribeToAll();
+        }
         return Promise.resolve();
     }
 
@@ -46,25 +50,26 @@ export class Publisher {
     }
 
     private async publishFeed() {
-        this.pc = new RTCPeerConnection({
-            iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
-        });
         if (this.localStream) {
-            const ls = this.localStream;
-            ls.getTracks().forEach(t => this.pc?.addTrack(t, ls));
+            this.pc = new RTCPeerConnection({
+                iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
+            });
+
+            this.localStream.getTracks().forEach(t => this.pc?.addTrack(t, ls));
+
+            const offer = await this.pc.createOffer({
+                offerToReceiveAudio: false,
+                offerToReceiveVideo: false
+            });
+            await this.pc.setLocalDescription(offer);
+            const resp = await this.handle?.send({
+                request: "publish",
+                audio: userMedia.audioEnabled(),
+                video: userMedia.videoEnabled(),
+                data: false
+            }, offer);
+            console.log(`rcvd offer resp ${prettifyJson(resp)}`)
         }
-        const offer = await this.pc.createOffer({
-            offerToReceiveAudio: false,
-            offerToReceiveVideo: false,
-        });
-        await this.pc.setLocalDescription(offer);
-        const resp = await this.handle?.send({
-            request: "publish",
-            audio: userMedia.audioDeviceId !== undefined,
-            video: userMedia.videoDeviceId !== undefined,
-            data: false
-        }, offer);
-        console.log(`rcvd offer resp ${prettifyJson(resp)}`)
     }
 
     private async handleJanusEvent(event: JanusVideoRoomEvent) {

@@ -22,26 +22,23 @@ window.addEventListener('load', () => {
 });
 
 joinBtn.onclick = () => {
-    if (userMedia.videoDeviceId === null && userMedia.audioDeviceId === null) {
-        alert('select atleast one of audio or video devices to proceed');
-    } else {
-        unhideEl(progressBar);
-        setupRoom().then(() => {
-            console.log("All set, rendering video room");
-            hideEl(constraintsDiv);
-            hideEl(progressBar);
-            unhideEl(roomDiv);
-            unhideEl(statsDiv);
-        }).catch(e => {
-            console.log(`error in setting up room ${e}`);
-            alert('error in setting up room. check console and reload to try again');
-        });
-    }
+    unhideEl(progressBar);
+    setupRoom().then(() => {
+        console.log("All set, rendering video room");
+        hideEl(constraintsDiv);
+        hideEl(progressBar);
+        unhideEl(roomDiv);
+        unhideEl(statsDiv);
+    }).catch(e => {
+        console.log(`error in setting up room ${e}`);
+        alert('error in setting up room. check console and reload to try again');
+    });
 }
 
 async function showDeviceOptions() {
     let audioDevices = await userMedia.audioInDevices();
     let videoDevices = await userMedia.videoDevices();
+
     audioDevices.forEach(device => {
         const option = document.createElement("option");
         option.text = device.label || `Audio device ${device.deviceId}`;

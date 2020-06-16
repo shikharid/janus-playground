@@ -18,9 +18,11 @@ export class VideoRoom {
 
     public async subscribe(participant: ParticipantInfo) {
         console.log(`subscribing to ${participant.display}:${participant.id}`);
-        let subscriber = new Subscriber(this, participant);
-        await subscriber.init();
-        this.subscribers.set(participant.id, subscriber);
+        if (!this.subscribers.has(participant.id)) {
+            let subscriber = new Subscriber(this, participant);
+            await subscriber.init();
+            this.subscribers.set(participant.id, subscriber);
+        }
     }
 
     public unsubscribe(subscriber: Subscriber) {
@@ -40,6 +42,8 @@ export class VideoRoom {
 
     async subscribeToAll() {
         const participants = await this.listParticipants();
-        participants.forEach(participant => this.subscribe(participant));
+        if (participants) {
+            participants.forEach(participant => this.subscribe(participant));
+        }
     }
 }
